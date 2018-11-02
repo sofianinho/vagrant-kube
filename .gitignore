@@ -1,0 +1,4 @@
+join.txt
+*.log
+.vagrant/
+config
