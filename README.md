@@ -23,6 +23,7 @@ kubectl --kubeconfig=./config cluster-info #may take a while the first time
 kubectl --kubeconfig=./config get nodes
 kubectl --kubeconfig=./config describe nodes
 ```
+To make this step more secure, follow instructions from [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) and this [cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration).
 
 ## LICENSE
 MIT
