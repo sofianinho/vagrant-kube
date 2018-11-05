@@ -12,6 +12,18 @@ vagrant up
 ```
 Default values for workers and subnet are 1 and 192.168.66.0, respectively
 
+## Full list of possible configurations
+
+| Variable        | Definition           | Default  | Example value |
+| :-------------: |:-------------:| :-----:|:------:|
+| `VAGRANT_SUBNET`| Private subnet for VMs where the cluster is formed and peered. <br> Master is at .100 and Workers start at .150 | `192.168.66.0` |`192.168.178.0`, `10.10.0.0`|
+| `VAGRANT_WORKERS`      | Number of workers in the cluster (master is also a worker)      |   1 | 5|
+| `VAGRANT_MASTER_RAM` | Memory for the master      |    2048 | 4096, 1024 |
+| `VAGRANT_MASTER_CPU` | Number of CPUs for the master      |    1 | 2 |
+| `VAGRANT_WORKER_RAM` | Memory per worker      |    2048 | 4096, 1024 |
+| `VAGRANT_WORKER_CPU` | Number of CPUs for per worker      |    1 | 2 |
+
+
 ## Interact with the cluster remotely (from host)
 
 For that, I find the simplest way is to copy your cluster config outside of the master vm and use kubectl with --kubeconfig flag

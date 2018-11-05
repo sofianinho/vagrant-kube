@@ -6,8 +6,10 @@
 $image_version = "ubuntu/bionic64"
 $enable_serial_logging = false
 $vm_gui = false
-$vm_memory = 2048
-$vm_cpus = 1
+$vm_memory_master = ENV.fetch('VAGRANT_MASTER_RAM', 2048).to_i
+$vm_memory_worker = ENV.fetch('VAGRANT_WORKER_RAM', 2048).to_i
+$vm_cpus_master = ENV.fetch('VAGRANT_MASTER_CPU', 1).to_i
+$vm_cpus_worker = ENV.fetch('VAGRANT_WORKER_CPU', 1).to_i
 $default_subnet = ENV.fetch('VAGRANT_SUBNET', '192.168.66.0')
 $default_workers = ENV.fetch('VAGRANT_WORKERS', 1).to_i
 $subnet_ip = "#{$default_subnet.split(%r{\.\d*$}).join('')}"
@@ -24,8 +26,8 @@ Vagrant.configure("2") do |config|
       config.vm.hostname = "master" 
       config.vm.provider :virtualbox do |vb|
         vb.gui = $vm_gui
-        vb.memory = $vm_memory
-        vb.cpus = $vm_cpus
+        vb.memory = $vm_memory_master
+        vb.cpus = $vm_cpus_master
       end
     end
     master_conf.vm.network :private_network, ip: $master_ip
@@ -43,8 +45,8 @@ Vagrant.configure("2") do |config|
       worker_conf.vm.hostname = "worker-#{i}"
       worker_conf.vm.provider :virtualbox do |vb|
         vb.gui = $vm_gui
-        vb.memory = $vm_memory
-        vb.cpus = $vm_cpus
+        vb.memory = $vm_memory_worker
+        vb.cpus = $vm_cpus_worker
       end
       ip = $subnet_ip + "." + "#{i+150}"
       worker_conf.vm.network :private_network, ip: ip
