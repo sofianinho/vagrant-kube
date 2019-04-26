@@ -31,9 +31,10 @@ For that, I find the simplest way is to copy your cluster config outside of the 
 vagrant ssh master
 cp .kube/config /vagrant
 exit
-kubectl --kubeconfig=./config cluster-info #may take a while the first time
-kubectl --kubeconfig=./config get nodes
-kubectl --kubeconfig=./config describe nodes
+alias vk8s="kubectl --kubeconfig=./config"
+vk8s cluster-info #may take a while the first time
+vk8s get nodes
+vk8s describe nodes
 ```
 To make this step more secure, follow instructions from [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) and this [cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration).
 
