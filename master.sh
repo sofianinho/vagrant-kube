@@ -50,15 +50,21 @@ info "Peering address for master is: "$PEER_ADDRESS
 
 info "Initializing kubeadm"
 sudo kubeadm init --apiserver-advertise-address=$PEER_ADDRESS --pod-network-cidr=10.244.0.0/16
-sudo cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-sudo chown vagrant:vagrant /home/vagrant/.kube/config
+mkdir -p $HOME/.kube
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+
+info "Trying to ping the kube"
+sudo kubectl get nodes
 
 info "Setting the master as a worker too"
-kubectl taint nodes --all node-role.kubernetes.io/master-
+sudo kubectl taint nodes --all node-role.kubernetes.io/master-
 
 info "setting the networking driver: Flannel"
 FLANNEL_URL="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
-kubectl apply -f $FLANNEL_URL
+sudo kubectl apply -f $FLANNEL_URL
 
 
 info "Setting the join command"
@@ -69,3 +75,10 @@ JOIN_COMMAND="sudo kubeadm join "$PEER_ADDRESS":6443 --token "$JOIN_TOKEN" --dis
 info "In order to join the cluster, run this command: "
 info "$JOIN_COMMAND"
 echo $JOIN_COMMAND > /vagrant/join.txt
+
+info "removing credentials from root folder and passing them to vagrant"
+mkdir -p /home/vagrant/.kube
+sudo cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+sudo chown -R vagrant:vagrant /home/vagrant/.kube
+
+
