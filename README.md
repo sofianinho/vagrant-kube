@@ -2,6 +2,10 @@
 
 Simple vagrantfile for any sized cluster (master + workers) in Ubuntu 18.04 VMs. Very configurable through 2 env variables.
 
+## Warning
+
+This branch is the CRI-O branch. In this branch I use [cri-o](https://cri-o.io/) instead of Docker as the CNI runtime.
+
 ## Use
 
 The following commands for instance will bootstrap a kubernetes cluster with a master and 2 workers with a specific private subnet:

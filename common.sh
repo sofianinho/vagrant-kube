@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DOCKER_REPO_URL="https://download.docker.com/linux/ubuntu"
-DOCKER_REPO_GPG=$DOCKER_REPO_URL"/gpg"
+CRIO_REPO_PPA="ppa:projectatomic/ppa"
 GOOGLE_REPO_GPG="https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 K8S_REPO_URL="http://apt.kubernetes.io/"
 
@@ -29,12 +28,12 @@ error() {
 # Installation 
 sudo apt-get update -q && sudo apt-get upgrade -y
 
-info "Installing Docker"
-curl -fsSL $DOCKER_REPO_GPG -o docker.gpg
-sudo apt-key add docker.gpg
-sudo add-apt-repository "deb [arch=amd64] $DOCKER_REPO_URL bionic stable"
-sudo apt-get install -y docker-ce
-sudo usermod -aG docker "${USER}"
+info "Installing CRI-O"
+sudo add-apt-repository $CRIO_REPO_PPA
+#get the latest version of crio
+LATEST_CRIO_VERSION=$(sudo apt search cri-o |awk  '/cri\-o\-[0-9]\.[0-9]+/{print $1}'|cut -d'/' -f1|tail -n 1)
+sudo apt-get install -y $LATEST_CRIO_VERSION
+
 
 info "Installing kubernetes binaries"
 
@@ -47,10 +46,18 @@ mkdir /home/vagrant/.kube
 kubectl completion bash > kubectl
 sudo mv kubectl /etc/bash_completion.d/
 
+info "fixing issues of crio"
+sudo sed 's|/usr/libexec/crio/conmon|/usr/bin/conmon|' -i /etc/crio/crio.conf
+sudo systemctl restart cri-o.service
+
 info "adding kernel modules for kubeadm"
 sudo modprobe ip_vs_wrr 
 sudo modprobe ip_vs_rr
 sudo modprobe ip_vs_sh
 sudo modprobe ip_vs
+sudo modprobe br_netfilter
+echo "net.bridge.bridge-nf-call-iptables = 1" |sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+sudo echo 1 > /proc/sys/net/ipv4/ip_forward
 
 

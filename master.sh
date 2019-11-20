@@ -49,7 +49,8 @@ PEER_ADDRESS=$(ip -4 a |grep $_SUBNET |awk -F "inet |/" '{ print $2 }')
 info "Peering address for master is: "$PEER_ADDRESS
 
 info "Initializing kubeadm"
-sudo kubeadm init --apiserver-advertise-address=$PEER_ADDRESS --pod-network-cidr=10.244.0.0/16
+echo "KUBELET_EXTRA_ARGS=--feature-gates=\"AllAlpha=false,RunAsGroup=true\" --container-runtime=remote --cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m" |sudo tee -a /etc/default/kubelet
+sudo kubeadm init --apiserver-advertise-address=$PEER_ADDRESS --pod-network-cidr=10.88.0.0/16
 mkdir -p $HOME/.kube
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -61,11 +62,6 @@ sudo kubectl get nodes
 
 info "Setting the master as a worker too"
 sudo kubectl taint nodes --all node-role.kubernetes.io/master-
-
-info "setting the networking driver: Flannel"
-FLANNEL_URL="https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
-sudo kubectl apply -f $FLANNEL_URL
-
 
 info "Setting the join command"
 JOIN_TOKEN=$(kubeadm token list |tail -n -1| awk '{ print $1 }')
